@@ -1,0 +1,47 @@
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Nunito", ui-sans-serif, system-ui, sans-serif;
+  
+  --color-bg-base: #f4ece6;
+  --color-surface: #fdfaf7;
+  --color-primary: #f2bba7;
+  --color-secondary: #a8cce3;
+  --color-accent: #f5d0c9;
+  --color-text-main: #5a504b;
+  --color-text-muted: #9e938e;
+
+  --shadow-clay: 8px 8px 16px #e0d6cf, -8px -8px 16px #ffffff;
+  --shadow-clay-sm: 4px 4px 8px #e0d6cf, -4px -4px 8px #ffffff;
+  --shadow-clay-inset: inset 4px 4px 8px #e0d6cf, inset -4px -4px 8px #ffffff;
+  --shadow-clay-btn: 4px 4px 10px #e0d6cf, -4px -4px 10px #ffffff, inset 1px 1px 2px rgba(255,255,255,0.8), inset -1px -1px 2px rgba(0,0,0,0.05);
+  --shadow-clay-btn-active: inset 4px 4px 8px #e0d6cf, inset -4px -4px 8px #ffffff;
+}
+
+@layer base {
+  body {
+    @apply bg-[var(--color-bg-base)] text-[var(--color-text-main)] font-sans antialiased selection:bg-primary/30;
+  }
+}
+
+@layer utilities {
+  .clay-card {
+    @apply bg-[var(--color-surface)] rounded-3xl shadow-clay border border-white/40;
+  }
+  .clay-panel {
+    @apply bg-[var(--color-bg-base)] rounded-3xl shadow-clay-inset border border-white/20;
+  }
+  .clay-btn {
+    @apply bg-[var(--color-surface)] rounded-full shadow-clay-btn border border-white/50 transition-all duration-200 active:shadow-clay-btn-active active:scale-95 font-bold text-[var(--color-text-main)];
+  }
+  .clay-btn-primary {
+    @apply bg-[var(--color-primary)] rounded-full shadow-clay-btn border border-white/30 transition-all duration-200 active:shadow-clay-btn-active active:scale-95 font-bold text-white;
+  }
+  .clay-btn-secondary {
+    @apply bg-[var(--color-secondary)] rounded-full shadow-clay-btn border border-white/30 transition-all duration-200 active:shadow-clay-btn-active active:scale-95 font-bold text-white;
+  }
+  .clay-input {
+    @apply bg-[var(--color-bg-base)] rounded-2xl shadow-clay-inset border-none px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/50 text-[var(--color-text-main)] placeholder-[var(--color-text-muted)];
+  }
+}
