@@ -1,0 +1,292 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  ADMIN
+  USER
+}
+
+enum UserStatus {
+  ACTIVE
+  SUSPENDED
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+}
+
+enum MealType {
+  BREAKFAST
+  LUNCH
+  DINNER
+  SNACK
+}
+
+enum AiMessageRole {
+  USER
+  ASSISTANT
+  SYSTEM
+}
+
+model User {
+  id              String           @id @default(cuid())
+  email           String           @unique
+  passwordHash    String
+  role            UserRole         @default(USER)
+  status          UserStatus       @default(ACTIVE)
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  profile         UserProfile?
+  dailyMetrics    DailyMetric[]
+  dailyCheckIns   DailyCheckIn[]
+  habits          HabitDefinition[]
+  habitLogs       HabitLog[]
+  waterLogs       WaterLog[]
+  mealPlans       MealPlan[]
+  mealLogs        MealLog[]
+  workoutPlans    WorkoutPlan[]
+  aiConversations AiConversation[]
+  badgeProgress   BadgeProgress[]
+  adminAuditLogs  AdminAuditLog[]  @relation("AdminActorLogs")
+  refreshTokens   RefreshToken[]
+  passwordResets  PasswordResetToken[]
+}
+
+model UserProfile {
+  id                   String    @id @default(cuid())
+  userId               String    @unique
+  name                 String?
+  age                  Int?
+  gender               Gender?
+  heightCm             Int?
+  weightKg             Int?
+  goals                String[]  @default([])
+  activityLevel        String?
+  planDuration         String?
+  targetWeightChangeKg Int?
+  targetTimeframe      String?
+  preferredLanguage    String?   @default("ja")
+  favoriteFoods        String[]  @default([])
+  activityPrefs        String[]  @default([])
+  aiWelcomeMessage     String?
+  isOnboarded          Boolean   @default(false)
+  lastCheckInDate      DateTime?
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+  user                 User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model DailyMetric {
+  id                  String   @id @default(cuid())
+  userId              String
+  date                DateTime
+  readiness           Int?
+  sleepScore          Int?
+  caloriesConsumed    Int      @default(0)
+  caloriesTarget      Int      @default(0)
+  proteinConsumed     Int      @default(0)
+  proteinTarget       Int      @default(0)
+  carbsConsumed       Int      @default(0)
+  carbsTarget         Int      @default(0)
+  fatConsumed         Int      @default(0)
+  fatTarget           Int      @default(0)
+  waterConsumedLiters Decimal  @default(0) @db.Decimal(5, 2)
+  waterTargetLiters   Decimal  @default(0) @db.Decimal(5, 2)
+  gems                Int      @default(0)
+  dailyInsight        String?
+  nutritionInsight    String?
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+  user                User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, date])
+  @@unique([userId, date])
+}
+
+model DailyCheckIn {
+  id             String   @id @default(cuid())
+  userId         String
+  date           DateTime
+  sleepHours     Decimal  @db.Decimal(4, 1)
+  sleepQuality   Int
+  soreness       Int
+  stress         Int
+  readinessScore Int
+  sleepScore     Int
+  insight        String?
+  createdAt      DateTime @default(now())
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, date])
+  @@unique([userId, date])
+}
+
+model HabitDefinition {
+  id           String   @id @default(cuid())
+  userId       String
+  name         String
+  icon         String
+  isWaterHabit Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  logs         HabitLog[]
+}
+
+model HabitLog {
+  id        String          @id @default(cuid())
+  userId    String
+  habitId   String
+  date      DateTime
+  completed Boolean         @default(false)
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+  user      User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  habit     HabitDefinition @relation(fields: [habitId], references: [id], onDelete: Cascade)
+
+  @@unique([habitId, date])
+}
+
+model WaterLog {
+  id           String   @id @default(cuid())
+  userId       String
+  date         DateTime
+  amountLiters Decimal  @db.Decimal(5, 2)
+  sourceLabel  String?
+  createdAt    DateTime @default(now())
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, date])
+}
+
+model MealPlan {
+  id        String    @id @default(cuid())
+  userId    String
+  date      DateTime
+  mealType  MealType
+  name      String
+  calories  Int
+  protein   Int
+  carbs     Int
+  fat       Int
+  reason    String?
+  createdAt DateTime  @default(now())
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model MealLog {
+  id        String    @id @default(cuid())
+  userId    String
+  date      DateTime
+  mealType  MealType
+  name      String
+  calories  Int
+  protein   Int
+  carbs     Int
+  fat       Int
+  source    String?
+  createdAt DateTime  @default(now())
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, date])
+}
+
+model WorkoutPlan {
+  id        String            @id @default(cuid())
+  userId    String
+  date      DateTime
+  title     String
+  duration  String
+  intensity String
+  calories  String
+  completedAt DateTime?
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
+  user      User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  exercises WorkoutExercise[]
+
+  @@index([userId, date])
+}
+
+model WorkoutExercise {
+  id            String      @id @default(cuid())
+  workoutPlanId String
+  slug          String
+  name          String
+  sets          Int
+  reps          String
+  position      Int
+  workoutPlan   WorkoutPlan @relation(fields: [workoutPlanId], references: [id], onDelete: Cascade)
+}
+
+model AiConversation {
+  id        String      @id @default(cuid())
+  userId    String
+  title     String?
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages  AiMessage[]
+}
+
+model AiMessage {
+  id             String         @id @default(cuid())
+  conversationId String
+  role           AiMessageRole
+  content        String
+  createdAt      DateTime       @default(now())
+  conversation   AiConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+}
+
+model BadgeProgress {
+  id        String   @id @default(cuid())
+  userId    String
+  code      String
+  unlocked  Boolean  @default(false)
+  progress  Int      @default(0)
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, code])
+}
+
+model AdminAuditLog {
+  id           String   @id @default(cuid())
+  actorUserId  String
+  targetUserId String?
+  action       String
+  metadata     Json?
+  createdAt    DateTime @default(now())
+  actor        User     @relation("AdminActorLogs", fields: [actorUserId], references: [id], onDelete: Cascade)
+}
+
+model RefreshToken {
+  id         String   @id @default(cuid())
+  userId     String
+  tokenHash  String   @unique
+  expiresAt  DateTime
+  revokedAt  DateTime?
+  createdAt  DateTime @default(now())
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, expiresAt])
+}
+
+model PasswordResetToken {
+  id         String   @id @default(cuid())
+  userId     String
+  tokenHash  String   @unique
+  expiresAt  DateTime
+  usedAt     DateTime?
+  createdAt  DateTime @default(now())
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, expiresAt])
+}

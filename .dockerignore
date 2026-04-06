@@ -1,0 +1,10 @@
+node_modules
+dist
+.git
+.next
+coverage
+apps/*/node_modules
+apps/*/.next
+apps/*/dist
+legacy/prototype-web/node_modules
+legacy/prototype-web/dist
