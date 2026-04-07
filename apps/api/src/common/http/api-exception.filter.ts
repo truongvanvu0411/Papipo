@@ -29,6 +29,14 @@ export class ApiExceptionFilter implements ExceptionFilter {
           ? (payload as { message: string[] }).message.join(', ')
           : (payload as { message?: string }).message ?? 'Unexpected error';
 
+    if (!(exception instanceof HttpException) || status >= HttpStatus.INTERNAL_SERVER_ERROR) {
+      console.error('[Papipo API Error]', {
+        path: request.url,
+        status,
+        exception
+      });
+    }
+
     response.status(status).json({
       error: {
         status,
