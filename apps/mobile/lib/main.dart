@@ -90,7 +90,7 @@ class _AppRouter extends StatelessWidget {
           case SessionBootstrapState.loading:
             return const _LoadingScreen();
           case SessionBootstrapState.ready:
-            if (!session.isAuthenticated) {
+            if (!session.isAuthenticated && !session.hasRecoveredSession) {
               return const AuthScreen();
             }
             if (!session.isOnboarded) {

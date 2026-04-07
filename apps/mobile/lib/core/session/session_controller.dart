@@ -55,6 +55,11 @@ class SessionController extends ChangeNotifier {
   List<Map<String, dynamic>> get aiConversations => _aiConversations;
   List<Map<String, dynamic>> get aiMessages => _aiMessages;
   String? get activeConversationId => _activeConversationId;
+  bool get hasRecoveredSession =>
+      _profileResponse != null ||
+      _dashboardResponse != null ||
+      _nutritionResponse != null ||
+      _workoutResponse != null;
   String get preferredLanguageCode {
     final profileLanguage = _profileResponse?['profile']?['preferredLanguage'];
     if (profileLanguage is String && profileLanguage.trim().isNotEmpty) {
@@ -105,11 +110,19 @@ class SessionController extends ChangeNotifier {
 
     try {
       await loadProfile(refreshOnUnauthorized: true);
-      if (isOnboarded) {
-        await refreshUserHomeData(refreshOnUnauthorized: true);
-      }
     } catch (_) {
       await _clearSession();
+      _bootstrapState = SessionBootstrapState.ready;
+      notifyListeners();
+      return;
+    }
+
+    if (isOnboarded) {
+      try {
+        await refreshUserHomeData(refreshOnUnauthorized: true);
+      } catch (_) {
+        // Keep the authenticated session even if home data refresh is flaky.
+      }
     }
 
     _bootstrapState = SessionBootstrapState.ready;
