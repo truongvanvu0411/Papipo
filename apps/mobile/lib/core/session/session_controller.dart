@@ -10,9 +10,13 @@ enum SessionBootstrapState { loading, ready }
 class SessionController extends ChangeNotifier {
   SessionController({
     ApiClient? apiClient,
-    FlutterSecureStorage? storage
+    FlutterSecureStorage? storage,
+    String? autoLoginEmail,
+    String? autoLoginPassword,
   })  : _apiClient = apiClient ?? ApiClient(),
-        _storage = storage ?? const FlutterSecureStorage();
+        _storage = storage ?? const FlutterSecureStorage(),
+        _autoLoginEmail = _normalizeOptionalValue(autoLoginEmail),
+        _autoLoginPassword = _normalizeOptionalValue(autoLoginPassword);
 
   static const _accessTokenKey = 'papipo.access_token';
   static const _refreshTokenKey = 'papipo.refresh_token';
@@ -20,6 +24,8 @@ class SessionController extends ChangeNotifier {
 
   final ApiClient _apiClient;
   final FlutterSecureStorage _storage;
+  final String? _autoLoginEmail;
+  final String? _autoLoginPassword;
 
   SessionBootstrapState _bootstrapState = SessionBootstrapState.loading;
   bool _isBusy = false;
@@ -82,6 +88,16 @@ class SessionController extends ChangeNotifier {
     }
 
     if (_accessToken == null) {
+      if (_autoLoginEmail != null && _autoLoginPassword != null) {
+        try {
+          await login(
+            email: _autoLoginEmail,
+            password: _autoLoginPassword,
+          );
+        } catch (_) {
+          await _clearSession();
+        }
+      }
       _bootstrapState = SessionBootstrapState.ready;
       notifyListeners();
       return;
@@ -541,5 +557,13 @@ class SessionController extends ChangeNotifier {
       _isBusy = false;
       notifyListeners();
     }
+  }
+
+  static String? _normalizeOptionalValue(String? value) {
+    if (value == null) {
+      return null;
+    }
+    final trimmed = value.trim();
+    return trimmed.isEmpty ? null : trimmed;
   }
 }

@@ -26,12 +26,22 @@ class PapipoBootstrap extends StatefulWidget {
 }
 
 class _PapipoBootstrapState extends State<PapipoBootstrap> {
+  static const _devAutoLoginEmail = String.fromEnvironment(
+    'PAPIPO_DEV_AUTO_LOGIN_EMAIL',
+  );
+  static const _devAutoLoginPassword = String.fromEnvironment(
+    'PAPIPO_DEV_AUTO_LOGIN_PASSWORD',
+  );
+
   late final SessionController _sessionController;
 
   @override
   void initState() {
     super.initState();
-    _sessionController = SessionController()..bootstrap();
+    _sessionController = SessionController(
+      autoLoginEmail: _devAutoLoginEmail,
+      autoLoginPassword: _devAutoLoginPassword,
+    )..bootstrap();
   }
 
   @override
