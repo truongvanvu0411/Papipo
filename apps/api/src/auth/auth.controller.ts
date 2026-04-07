@@ -9,7 +9,11 @@ import { JwtAuthGuard, type AuthenticatedRequest } from './jwt-auth.guard.js';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  private readonly authService: AuthService;
+
+  constructor(authService: AuthService) {
+    this.authService = authService;
+  }
 
   @Post('register')
   register(@Body() dto: RegisterDto) {

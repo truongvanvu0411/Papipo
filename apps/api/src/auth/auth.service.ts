@@ -21,11 +21,19 @@ type AuthUser = User & { profile: UserProfile | null };
 
 @Injectable()
 export class AuthService {
+  private readonly prisma: PrismaService;
+  private readonly jwtService: JwtService;
+  private readonly configService: ConfigService;
+
   constructor(
-    private readonly prisma: PrismaService,
-    private readonly jwtService: JwtService,
-    private readonly configService: ConfigService
-  ) {}
+    prisma: PrismaService,
+    jwtService: JwtService,
+    configService: ConfigService
+  ) {
+    this.prisma = prisma;
+    this.jwtService = jwtService;
+    this.configService = configService;
+  }
 
   async register(dto: RegisterDto) {
     const email = dto.email.toLowerCase();

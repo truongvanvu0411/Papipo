@@ -14,7 +14,11 @@ import { WellnessService } from './wellness.service.js';
 @Controller()
 @UseGuards(JwtAuthGuard)
 export class WellnessController {
-  constructor(private readonly wellnessService: WellnessService) {}
+  private readonly wellnessService: WellnessService;
+
+  constructor(wellnessService: WellnessService) {
+    this.wellnessService = wellnessService;
+  }
 
   @Post('onboarding/complete')
   completeOnboarding(@Req() request: AuthenticatedRequest, @Body() dto: CompleteOnboardingDto) {

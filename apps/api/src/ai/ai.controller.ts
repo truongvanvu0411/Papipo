@@ -6,7 +6,11 @@ import { CoachChatDto } from './dto/coach-chat.dto.js';
 @Controller('ai')
 @UseGuards(JwtAuthGuard)
 export class AiController {
-  constructor(private readonly aiService: AiService) {}
+  private readonly aiService: AiService;
+
+  constructor(aiService: AiService) {
+    this.aiService = aiService;
+  }
 
   @Get('conversations')
   listConversations(@Req() request: AuthenticatedRequest) {

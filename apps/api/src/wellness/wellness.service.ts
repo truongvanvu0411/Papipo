@@ -25,10 +25,16 @@ import { CompleteWorkoutDto, RegenerateWorkoutDto } from './dto/regenerate-worko
 
 @Injectable()
 export class WellnessService {
+  private readonly prisma: PrismaService;
+  private readonly configService: ConfigService;
+
   constructor(
-    private readonly prisma: PrismaService,
-    private readonly configService: ConfigService
-  ) {}
+    prisma: PrismaService,
+    configService: ConfigService
+  ) {
+    this.prisma = prisma;
+    this.configService = configService;
+  }
 
   async completeOnboarding(userId: string, dto: CompleteOnboardingDto) {
     const { start, end } = this.getDayBounds();

@@ -10,11 +10,16 @@ export class AiService {
   private readonly messageWindows = new Map<string, number[]>();
   private readonly rateLimitWindowMs = 5 * 60 * 1000;
   private readonly maxMessagesPerWindow = 8;
+  private readonly prisma: PrismaService;
+  private readonly configService: ConfigService;
 
   constructor(
-    private readonly prisma: PrismaService,
-    private readonly configService: ConfigService
-  ) {}
+    prisma: PrismaService,
+    configService: ConfigService
+  ) {
+    this.prisma = prisma;
+    this.configService = configService;
+  }
 
   async listConversations(userId: string): Promise<AiConversationSummary[]> {
     const conversations = await this.prisma.aiConversation.findMany({

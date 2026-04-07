@@ -21,11 +21,19 @@ export type AuthenticatedRequest = Request & {
 
 @Injectable()
 export class JwtAuthGuard implements CanActivate {
+  private readonly jwtService: JwtService;
+  private readonly configService: ConfigService;
+  private readonly prisma: PrismaService;
+
   constructor(
-    private readonly jwtService: JwtService,
-    private readonly configService: ConfigService,
-    private readonly prisma: PrismaService
-  ) {}
+    jwtService: JwtService,
+    configService: ConfigService,
+    prisma: PrismaService
+  ) {
+    this.jwtService = jwtService;
+    this.configService = configService;
+    this.prisma = prisma;
+  }
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest<AuthenticatedRequest>();

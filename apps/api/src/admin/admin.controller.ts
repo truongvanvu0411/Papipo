@@ -11,10 +11,16 @@ import { UpdateUserStatusDto } from './dto/update-user-status.dto.js';
 
 @Controller('admin')
 export class AdminController {
+  private readonly adminService: AdminService;
+  private readonly authService: AuthService;
+
   constructor(
-    private readonly adminService: AdminService,
-    private readonly authService: AuthService
-  ) {}
+    adminService: AdminService,
+    authService: AuthService
+  ) {
+    this.adminService = adminService;
+    this.authService = authService;
+  }
 
   @Post('auth/login')
   login(@Body() dto: LoginDto) {

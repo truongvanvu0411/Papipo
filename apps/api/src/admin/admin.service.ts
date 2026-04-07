@@ -11,7 +11,11 @@ import { AdminUserQueryDto } from './dto/admin-user-query.dto.js';
 
 @Injectable()
 export class AdminService {
-  constructor(private readonly prisma: PrismaService) {}
+  private readonly prisma: PrismaService;
+
+  constructor(prisma: PrismaService) {
+    this.prisma = prisma;
+  }
 
   async getOverview(): Promise<AdminDashboardOverview> {
     const [users, activeUsers, suspendedUsers, admins, recentUsers] = await Promise.all([
